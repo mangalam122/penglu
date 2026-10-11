@@ -9,52 +9,95 @@
   let open = false;
 
   const CSS = `
-    :host { all: initial; }
+    :host { all: initial;
+      --glass: rgba(250, 250, 252, .58); --glass-edge: rgba(255, 255, 255, .7); --glass-shade: rgba(0, 0, 0, .06);
+      --fill: rgba(120, 120, 128, .14); --fill-strong: rgba(120, 120, 128, .22); --hair: rgba(60, 60, 67, .14);
+      --ink: #1d1d1f; --ink-2: rgba(60, 60, 67, .62); --ink-3: rgba(60, 60, 67, .38);
+      --accent: #0a7aff; --accent-ink: #fff; --warn: #ff9f0a;
+      --scrim: rgba(242, 242, 247, .28);
+      --shadow: 0 30px 80px -20px rgba(0, 0, 0, .35), 0 2px 8px rgba(0, 0, 0, .08);
+      color-scheme: light; }
+    @media (prefers-color-scheme: dark) { :host {
+      --glass: rgba(36, 36, 40, .56); --glass-edge: rgba(255, 255, 255, .16); --glass-shade: rgba(0, 0, 0, .25);
+      --fill: rgba(120, 120, 128, .24); --fill-strong: rgba(120, 120, 128, .34); --hair: rgba(255, 255, 255, .1);
+      --ink: #f5f5f7; --ink-2: rgba(235, 235, 245, .62); --ink-3: rgba(235, 235, 245, .34);
+      --accent: #0a84ff; --scrim: rgba(0, 0, 0, .28);
+      --shadow: 0 30px 80px -20px rgba(0, 0, 0, .7), 0 2px 8px rgba(0, 0, 0, .3);
+      color-scheme: dark; } }
     * { box-sizing: border-box; }
-    .backdrop { position: fixed; inset: 0; background: rgba(14, 19, 34, .62);
-      display: grid; place-items: center; animation: fade .4s ease both; }
-    .held { font: italic 600 22px Georgia, 'Times New Roman', serif; color: #f3ead8; opacity: .9; }
-    .panel { position: fixed; right: 24px; bottom: 24px; width: 340px; max-width: calc(100vw - 32px);
-      background: #fbf8f1; color: #1b2030; border-radius: 18px; padding: 14px 16px 12px;
-      box-shadow: 0 24px 60px rgba(0,0,0,.45); display: flex; flex-direction: column; gap: 12px;
-      font: 14px/1.4 -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      animation: waddle .7s cubic-bezier(.2,.9,.25,1.15) both; }
+    .backdrop { position: fixed; inset: 0; background: var(--scrim);
+      -webkit-backdrop-filter: blur(10px) saturate(120%); backdrop-filter: blur(10px) saturate(120%);
+      animation: fade .35s ease both; }
+    .panel { position: fixed; left: 50%; top: 14vh; width: 620px; max-width: calc(100vw - 32px);
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,0) 40%), var(--glass);
+      -webkit-backdrop-filter: blur(40px) saturate(190%); backdrop-filter: blur(40px) saturate(190%);
+      border-radius: 28px; border: .5px solid var(--glass-edge);
+      box-shadow: var(--shadow), inset 0 1px 0 var(--glass-edge), inset 0 -1px 0 var(--glass-shade);
+      color: var(--ink); overflow: hidden;
+      font: 15px/1.35 -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      animation: rise .55s cubic-bezier(.2, .9, .3, 1.1) both; }
     @keyframes fade { from { opacity: 0 } }
-    @keyframes waddle { from { transform: translateX(420px) } }
-    .top { display: flex; justify-content: space-between; align-items: center; }
-    .who { font-weight: 700; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: #1f2a48; }
-    .who em { font: italic 600 15px Georgia, serif; text-transform: none; letter-spacing: 0; color: #8a6a1e; margin-left: 4px; }
-    .ring { position: relative; width: 46px; height: 46px; }
-    .ring svg { width: 46px; height: 46px; transform: rotate(-90deg); }
-    .ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 11px; color: #1f2a48;
-      font-variant-numeric: tabular-nums; }
-    .scene { display: grid; grid-template-columns: 92px 1fr; gap: 10px; align-items: end; }
-    .bubble { background: #fff; border: 1px solid #e6dfcf; border-radius: 14px 14px 14px 4px; padding: 10px 12px;
-      min-height: 96px; display: flex; align-items: center; }
-    .bubble p { margin: 0; font: italic 500 17px/1.3 Georgia, 'Times New Roman', serif; color: #1b2030; transition: opacity .2s; }
-    .bubble p.fade { opacity: 0; }
-    .tray { border-radius: 12px; background: #1f2a48; color: #f3ead8; padding: 10px 12px; display: flex;
-      justify-content: space-between; align-items: center; gap: 10px; }
-    .tray .name { font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box;
-      -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-    .tray .site { color: #b9c1d8; font-size: 11.5px; }
-    .tray .big { font-weight: 700; font-size: 18px; color: #f2c35a; white-space: nowrap; font-variant-numeric: tabular-nums; }
-    .reply { min-height: 42px; display: flex; flex-direction: column; gap: 8px; }
+    @keyframes rise { from { opacity: 0; transform: translateX(-50%) translateY(-12px) scale(.96); filter: blur(6px); } }
+
+    .field { display: flex; align-items: center; gap: 14px; padding: 16px 18px 16px 14px; position: relative; }
+    .avatar { flex: none; width: 52px; height: 52px; border-radius: 16px; background: var(--fill);
+      display: grid; place-items: center; overflow: hidden; }
+    .bubble { flex: 1; min-width: 0; }
+    .line { margin: 0; font: 500 19px/1.3 -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+      letter-spacing: -.01em; color: var(--ink); transition: opacity .2s ease, filter .2s ease; text-wrap: pretty; }
+    .line.fade { opacity: 0; filter: blur(3px); }
+    .who { margin-top: 2px; font-size: 12px; color: var(--ink-3); letter-spacing: .01em; }
+    .clock { flex: none; font: 600 13px -apple-system, system-ui, sans-serif; font-variant-numeric: tabular-nums;
+      color: var(--ink-2); background: var(--fill); border-radius: 999px; padding: 6px 10px; }
+    .progress { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--hair); }
+    .progress i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 2px;
+      box-shadow: 0 0 10px var(--accent); transition: width .25s linear; }
+
+    .section { padding: 10px 14px 4px; display: flex; flex-direction: column; gap: 10px; }
+    .label { padding: 0 6px; font-size: 11.5px; font-weight: 600; color: var(--ink-3); }
+    .tray { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 14px; background: var(--fill); }
+    .glyph { flex: none; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center;
+      background: linear-gradient(160deg, #5e9cff, #0a5cff); color: #fff; }
+    .glyph svg { width: 18px; height: 18px; }
+    .meta { flex: 1; min-width: 0; }
+    .tray .name { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tray .site { font-size: 12px; color: var(--ink-2); }
+    .tray .big { font: 600 17px -apple-system, system-ui, sans-serif; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+    .reply { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+    .reply:empty { display: none; }
     .row { display: flex; gap: 8px; }
-    input[type=text], input[type=number] { flex: 1; min-width: 0; height: 40px; border-radius: 10px; border: 1px solid #d9d2c1;
-      background: #fff; color: #1b2030; padding: 0 12px; font: inherit; }
-    input:focus-visible, button:focus-visible { outline: 3px solid #c9962b; outline-offset: 1px; }
-    input[type=range] { flex: 1; accent-color: #1f2a48; }
-    .scale { display: flex; align-items: center; gap: 10px; font-size: 12px; color: #5b6275; }
-    .scale output { font-weight: 700; font-size: 16px; color: #1f2a48; width: 24px; text-align: right; }
-    button { height: 40px; border-radius: 10px; border: 0; padding: 0 14px; font: 700 13px/1 inherit; font-family: inherit;
-      cursor: pointer; background: #ece6d8; color: #1f2a48; }
-    button.primary { background: #1f2a48; color: #f3ead8; }
+    input[type=text], input[type=number] { flex: 1; min-width: 0; height: 44px; border-radius: 12px; border: 0;
+      background: var(--fill); color: var(--ink); padding: 0 14px; font: inherit; outline: none; }
+    input::placeholder { color: var(--ink-3); }
+    input:focus-visible { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 40%, transparent); }
+    button { height: 44px; border-radius: 12px; border: 0; padding: 0 18px; cursor: pointer;
+      font: 600 14px -apple-system, system-ui, sans-serif; background: var(--fill); color: var(--ink);
+      transition: transform .12s ease, background .2s ease; }
+    button:hover { background: var(--fill-strong); }
+    button:active { transform: scale(.97); }
+    button:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 45%, transparent); }
+    button.primary { background: var(--accent); color: var(--accent-ink); }
+    button.primary:hover { background: color-mix(in srgb, var(--accent) 88%, #000); }
     button.grow { flex: 1; }
-    .foot { display: flex; justify-content: flex-end; }
-    .escape { background: none; height: auto; padding: 2px 0; font-weight: 500; font-size: 11px; color: #9a9384;
-      text-decoration: underline; }
-    #penguin { width: 92px; height: 108px; overflow: visible; }
+    .scale { display: flex; align-items: center; gap: 12px; padding: 4px 6px; font-size: 12px; color: var(--ink-3); }
+    input[type=range] { flex: 1; -webkit-appearance: none; appearance: none; height: 28px; background: transparent; outline: none; --p: 44.4%; }
+    input[type=range]::-webkit-slider-runnable-track { height: 6px; border-radius: 3px;
+      background: linear-gradient(to right, var(--accent) var(--p), var(--fill-strong) var(--p)); }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; margin-top: -10px;
+      border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.22), 0 0 0 .5px rgba(0,0,0,.08); }
+    input[type=range]:focus-visible::-webkit-slider-thumb { box-shadow: 0 2px 6px rgba(0,0,0,.22), 0 0 0 4px color-mix(in srgb, var(--accent) 40%, transparent); }
+    .scale output { font: 600 20px -apple-system, system-ui, sans-serif; color: var(--ink); width: 28px; text-align: right;
+      font-variant-numeric: tabular-nums; }
+
+    .foot { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px 14px;
+      font-size: 11.5px; color: var(--ink-3); }
+    .escape { background: none; height: auto; padding: 0; font-weight: 500; font-size: 11.5px; color: var(--ink-3); }
+    .escape:hover { background: none; color: var(--ink-2); }
+
+    #penguin { width: 48px; height: 57px; margin-top: 10px; overflow: visible; }
     #penguin .all { transform-origin: 60px 130px; transition: transform .5s ease; }
     #penguin .brow { transition: transform .35s ease; transform-box: fill-box; transform-origin: center; }
     #penguin .mono { transition: transform .5s ease; transform-origin: 72px 50px; }
@@ -75,7 +118,7 @@
   `;
 
   const PENGUIN = `
-    <svg id="penguin" class="composed" viewBox="0 0 120 140" role="img" aria-label="Penglu the penguin butler">
+    <svg id="penguin" class="composed" viewBox="8 18 104 124" role="img" aria-label="Penglu the penguin butler">
       <g class="all">
         <ellipse cx="44" cy="134" rx="13" ry="5" fill="#d9a441"/><ellipse cx="76" cy="134" rx="13" ry="5" fill="#d9a441"/>
         <g class="flip"><ellipse cx="18" cy="96" rx="9" ry="24" fill="#1d2230" transform="rotate(14 18 96)"/><circle cx="13" cy="117" r="6" fill="#fff" stroke="#d9d2c1"/></g>
@@ -93,19 +136,23 @@
       </g>
     </svg>`;
 
+  const BAG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 9.5h15l-1.3 9.4a2 2 0 0 1-2 1.6H7.8a2 2 0 0 1-2-1.6z"/><path d="M8.5 9.5V8a3.5 3.5 0 0 1 7 0v1.5"/></svg>';
+  const CLOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>';
+
   const HTML = `
-    <div class="backdrop"><span class="held">Held by Penglu</span></div>
+    <div class="backdrop"></div>
     <section class="panel" role="dialog" aria-label="Penglu is holding this purchase">
-      <div class="top">
-        <div class="who">Penglu <em>at your service</em></div>
-        <div class="ring"><svg viewBox="0 0 46 46"><circle cx="23" cy="23" r="19" fill="none" stroke="#e6dfcf" stroke-width="4"/>
-          <circle class="arc" cx="23" cy="23" r="19" fill="none" stroke="#c9962b" stroke-width="4" stroke-linecap="round"
-            stroke-dasharray="119.4" stroke-dashoffset="0"/></svg><b class="clock">2:00</b></div>
+      <div class="field">
+        <div class="avatar">${PENGUIN}</div>
+        <div class="bubble" aria-live="polite"><p class="line">Ahem.</p><div class="who">Penglu is holding this purchase</div></div>
+        <span class="clock">2:00</span>
+        <div class="progress"><i></i></div>
       </div>
-      <div class="scene">${PENGUIN}<div class="bubble" aria-live="polite"><p class="line">Ahem.</p></div></div>
-      <div class="tray"><div><div class="name"></div><div class="site"></div></div><div class="big"></div></div>
-      <div class="reply"></div>
-      <div class="foot"><button class="escape" type="button">Emergency: let me through</button></div>
+      <div class="section">
+        <div class="tray"><span class="glyph">${BAG}</span><div class="meta"><div class="name"></div><div class="site"></div></div><div class="big"></div></div>
+        <div class="reply"></div>
+      </div>
+      <div class="foot"><span>Your order hasn't been placed</span><button class="escape" type="button">Emergency: let me through</button></div>
     </section>`;
 
   const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -176,7 +223,7 @@
         const hours = S.workHours(product.price.amount, rate);
         if (hours) {
           say(S.line('cost', { ...ctx, hours }));
-          tray('Cost in your working hours', `at ₹${Number(rate).toLocaleString('en-IN')} an hour`, `${hours} hrs`);
+          tray('Cost in your working hours', `at ₹${Number(rate).toLocaleString('en-IN')} an hour`, `${hours} hrs`, 'clock');
           await wait(5000);
         }
       }
@@ -215,7 +262,9 @@
           setReply(`<div class="scale"><span>1</span><input type="range" min="1" max="10" value="5"><span>10</span>
             <output>5</output></div><div class="row"><button class="primary grow" type="button">That's my answer</button></div>`);
           const range = reply.querySelector('input'), out = reply.querySelector('output');
-          range.addEventListener('input', () => { out.textContent = range.value; });
+          const paint = () => { out.textContent = range.value; range.style.setProperty('--p', ((range.value - 1) / 9 * 100) + '%'); };
+          range.addEventListener('input', paint);
+          paint();
           range.focus();
           reply.querySelector('button').addEventListener('click', () => resolve(Number(range.value)));
         } else {
@@ -255,7 +304,8 @@
       setTimeout(() => { lineEl.textContent = text; lineEl.classList.remove('fade'); }, 200);
       penguin.setAttribute('class', mood || 'composed');
     }
-    function tray(name, site, big) {
+    function tray(name, site, big, glyph) {
+      $('.glyph').innerHTML = glyph === 'clock' ? CLOCK : BAG;
       $('.tray .name').textContent = name;
       $('.tray .site').textContent = site;
       $('.tray .big').textContent = big;
@@ -271,7 +321,7 @@
     function tick() {
       const left = Math.max(0, Math.ceil(S.HOLD_SECONDS - elapsed()));
       $('.clock').textContent = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
-      $('.arc').setAttribute('stroke-dashoffset', (119.4 * Math.min(1, elapsed() / S.HOLD_SECONDS)).toFixed(1));
+      $('.progress i').style.width = (100 * Math.min(1, elapsed() / S.HOLD_SECONDS)).toFixed(1) + '%';
     }
 
     async function finish(decision, lineKey) {
