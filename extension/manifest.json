@@ -4,7 +4,8 @@
   "version": "0.1.0",
   "description": "A penguin butler who politely stops impulse purchases.",
   "permissions": [
-    "storage"
+    "storage",
+    "activeTab"
   ],
   "background": {
     "service_worker": "src/background.js"
@@ -28,5 +29,9 @@
         "src/content.js"
       ]
     }
-  ]
+  ],
+  "action": {
+    "default_title": "Penglu",
+    "default_popup": "popup/popup.html"
+  }
 }

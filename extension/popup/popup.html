@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Penglu</title>
+<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="aura" aria-hidden="true"><i></i><i></i><i></i></div>
+
+  <header class="bar">
+    <div class="brand">
+      <span class="mark" aria-hidden="true">
+        <svg viewBox="8 18 104 124"><ellipse cx="60" cy="82" rx="44" ry="54" fill="#1d2230"/><ellipse cx="60" cy="96" rx="30" ry="38" fill="#f3ead8"/><ellipse cx="60" cy="50" rx="27" ry="21" fill="#f3ead8"/><circle cx="49" cy="49" r="4" fill="#1d2230"/><circle cx="71" cy="49" r="4" fill="#1d2230"/><path d="M54 57 L66 57 L60 66 Z" fill="#e0a33a"/><circle cx="71" cy="49" r="8.5" fill="none" stroke="#c9962b" stroke-width="2.4"/><path d="M60 76 L47 69 L47 83 Z M60 76 L73 69 L73 83 Z" fill="#1f3a8a"/></svg>
+      </span>
+      <div>
+        <div class="title">Penglu</div>
+        <div class="status" id="status">Watching for purchases</div>
+      </div>
+    </div>
+    <button class="icon" id="toggle-settings" type="button" aria-label="Settings" aria-pressed="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </header>
+
+  <main id="ledger-view">
+    <section class="glass hero">
+      <div class="month">
+        <button class="chev" id="prev" type="button" aria-label="Previous month">‹</button>
+        <span id="month-label">October 2026</span>
+        <button class="chev" id="next" type="button" aria-label="Next month">›</button>
+      </div>
+      <div class="kicker">Saved this month</div>
+      <div class="big" id="saved">₹0</div>
+      <div class="sub" id="sub">Nothing declined yet</div>
+    </section>
+
+    <div class="segmented" role="tablist">
+      <button type="button" role="tab" id="tab-skipped" aria-selected="true">Skipped</button>
+      <button type="button" role="tab" id="tab-let" aria-selected="false">Let through</button>
+    </div>
+
+    <section class="glass list" id="list"></section>
+  </main>
+
+  <main id="settings-view" hidden>
+    <div class="group-label">Money</div>
+    <section class="glass group">
+      <label class="row" for="rate"><span>Your hourly rate</span>
+        <span class="field"><span class="unit">₹</span><input id="rate" type="number" min="0" step="1" inputmode="numeric" placeholder="Not set"></span></label>
+      <label class="row" for="threshold"><span>Stay quiet under</span>
+        <span class="field"><span class="unit">₹</span><input id="threshold" type="number" min="0" step="50" inputmode="numeric"></span></label>
+    </section>
+    <p class="hint">Penglu turns prices into hours of your work, and ignores purchases below the threshold.</p>
+
+    <div class="group-label">Snooze</div>
+    <section class="glass group snooze">
+      <button type="button" data-snooze="60">1 hour</button>
+      <button type="button" data-snooze="tomorrow">Until tomorrow</button>
+      <button type="button" data-snooze="0" id="wake">Wake up</button>
+    </section>
+
+    <div class="group-label">Always allowed</div>
+    <section class="glass group">
+      <div class="chips" id="chips"></div>
+      <div class="row add"><span id="this-site">This site</span><button type="button" id="allow-site">Allow</button></div>
+    </section>
+    <p class="hint">Groceries, food and medicines skip Penglu entirely.</p>
+  </main>
+
+  <script src="../src/price.js"></script>
+  <script src="../src/settings.js"></script>
+  <script src="../src/ledger.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
