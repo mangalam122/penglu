@@ -1,0 +1,9 @@
+{
+  "name": "penglu",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A penguin butler who stops impulse purchases",
+  "scripts": {
+    "test": "node --test extension/test/*.test.js"
+  }
+}
