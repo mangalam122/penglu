@@ -39,7 +39,7 @@
     /^checkout( now)?$/
   ];
 
-  const CHECKOUT_URL = /\/(checkout|payment|payments|pay|billing|buy|purchase|order[-_/]?review|place[-_]?order)(\/|\?|#|$|[-_])/i;
+  const CHECKOUT_URL = /\/(checkout|payment|payments|pay|billing|buy|purchase|order[-_/]?review|place[-_]?order)(\/|$)/i;
 
   // Button text longer than this is a product card or a paragraph, not a button.
   const MAX_LABEL = 48;
@@ -55,9 +55,9 @@
   function isCheckoutUrl(url) {
     try {
       const u = new URL(url);
-      return CHECKOUT_URL.test(u.pathname + u.search);
+      return CHECKOUT_URL.test(u.pathname);
     } catch (_) {
-      return CHECKOUT_URL.test(String(url || ''));
+      return CHECKOUT_URL.test(String(url || '').split(/[?#]/)[0]);
     }
   }
 
