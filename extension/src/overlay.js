@@ -172,6 +172,7 @@
           if (done) return;
           if (rate > 0) storageSet({ hourlyRate: rate });
         }
+        clearReply();
         const hours = S.workHours(product.price.amount, rate);
         if (hours) {
           say(S.line('cost', { ...ctx, hours }));
