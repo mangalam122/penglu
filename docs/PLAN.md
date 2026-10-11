@@ -25,12 +25,14 @@ Goal: clicking a final buy button on any site is held for 2 minutes by Penglu.
 - **Demo:** load unpacked, click Place order on the test shop, Penglu appears.
 - Known gap: a bare `<div>` with a click handler and no role isn't detected yet (Phase 5 teaching).
 
-## Phase 2: Ledger in the extension
+## Phase 2: Ledger in the extension (done)
 
-- [ ] Remember the last product page per site (name, price, URL)
-- [ ] Save each intervention to `chrome.storage.local`
-- [ ] Popup: month total, skipped items with links, bought-anyway list
-- [ ] Settings: hourly rate, price threshold, allowlist, snooze
+- [x] Price finder that prefers the order total and ignores promos, offers and MRP
+- [x] Remember the last product page per site (name, price, clean link, image)
+- [x] Save each decision to `chrome.storage.local` (skipped or let through, with answers)
+- [x] Toolbar popup: month total, skipped items with links, let-through list
+- [x] Settings: hourly rate, price threshold, allowlist, snooze
+- [x] Spotlight-style glass design for the hold and the popup, light and dark
 
 ## Phase 3: macOS app and the bridge
 

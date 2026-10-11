@@ -12,7 +12,7 @@ with its link, so you can see how much you saved each month.
 
 | Part | What it does | Status |
 |---|---|---|
-| `extension/` | Chrome extension: detects purchase clicks, blocks them, runs the hold | Phase 1 done |
+| `extension/` | Chrome extension: detects purchase clicks, holds them, keeps the ledger | Phases 1–2 done |
 | `macos/` | Native menu-bar app: floating Penglu popup, local model, ledger | Phase 2+ |
 
 The extension works on its own. Once the Mac app exists, the extension hands
@@ -29,6 +29,10 @@ in-page overlay when the app isn't running.
 
 The first time, Penglu asks what you earn in an hour so he can turn prices
 into hours of work. He remembers it after that.
+
+Click the Penglu icon in the toolbar to see what you've saved this month,
+every skipped item with its link, and settings (hourly rate, a threshold
+below which Penglu stays quiet, always-allowed sites, and snooze).
 
 ## Run the tests
 
