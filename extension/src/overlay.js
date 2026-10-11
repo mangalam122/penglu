@@ -188,11 +188,12 @@
     tray(product.name || 'This purchase', product.site || location.hostname, priceText === 'this' ? '' : priceText);
 
     let done = false, begIndex = 0;
+    const answers = {};
     const started = Date.now();
     const timer = setInterval(tick, 250);
     tick();
 
-    $('.escape').addEventListener('click', () => finish('release', 'bought'));
+    $('.escape').addEventListener('click', () => finish('release', 'bought', 'let-through'));
 
     run();
 
@@ -207,17 +208,19 @@
         const answer = await ask(q);
         if (done || answer === undefined) return;
         if (answer === null) break; // the clock ran out
+        answers[q.id] = answer;
         const r = S.reaction(q.id, answer, ctx);
         if (r) { say(r); await wait(2600); }
       }
 
       if (!timeUp() && product.price && product.price.currency === 'INR') {
-        let rate = await storageGet('hourlyRate');
+        const settings = P.settings.withDefaults(await storageGet('settings'));
+        let rate = settings.hourlyRate;
         if (!(rate > 0)) {
           say(S.line('askRate', ctx));
           rate = await askRate();
           if (done) return;
-          if (rate > 0) storageSet({ hourlyRate: rate });
+          if (rate > 0) storageSet({ settings: { ...settings, hourlyRate: rate } });
         }
         clearReply();
         const hours = S.workHours(product.price.amount, rate);
@@ -229,6 +232,11 @@
       }
 
       clearReply();
+      const before = P.ledger.attemptsThisWeek(await storageGet('ledger'));
+      if (before > 0 && !timeUp() && !done) {
+        say(S.line('repeat', { ...ctx, n: ordinal(before + 1) }));
+        await waitUntilOr(5000);
+      }
       while (!timeUp() && !done) {
         say(S.line('beg', ctx, begIndex++));
         await waitUntilOr(6500);
@@ -241,8 +249,8 @@
         <button class="primary grow" type="button" data-d="skip">I'll skip it</button>
         <button class="grow" type="button" data-d="need">I really need it</button></div>`);
       reply.querySelector('[data-d=skip]').focus();
-      reply.querySelector('[data-d=skip]').addEventListener('click', () => finish('cancel', 'skipped'));
-      reply.querySelector('[data-d=need]').addEventListener('click', () => finish('release', 'bought'));
+      reply.querySelector('[data-d=skip]').addEventListener('click', () => finish('cancel', 'skipped', 'skipped'));
+      reply.querySelector('[data-d=need]').addEventListener('click', () => finish('release', 'bought', 'let-through'));
     }
 
     // ---- inputs ----
@@ -324,7 +332,7 @@
       $('.progress i').style.width = (100 * Math.min(1, elapsed() / S.HOLD_SECONDS)).toFixed(1) + '%';
     }
 
-    async function finish(decision, lineKey) {
+    async function finish(decision, lineKey, outcome) {
       if (done) return;
       done = true;
       clearInterval(timer);
@@ -333,8 +341,12 @@
       await wait(2200);
       host.remove();
       open = false;
-      onDecision(decision);
+      onDecision(decision, { answers, outcome });
     }
+  }
+
+  function ordinal(n) {
+    return ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh'][n - 1] || `${n}th`;
   }
 
   function shortName(name) {

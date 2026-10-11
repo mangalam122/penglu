@@ -19,9 +19,12 @@
       "js": [
         "src/detector.js",
         "src/price.js",
+        "src/pricefinder.js",
+        "src/product.js",
+        "src/settings.js",
+        "src/ledger.js",
         "src/script.js",
         "src/overlay.js",
-        "src/pricefinder.js",
         "src/content.js"
       ]
     }

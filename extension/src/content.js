@@ -13,6 +13,19 @@
 
   const passes = new WeakMap(); // element -> pass expiry time
   let held = null;              // the element whose click is being held
+  let settings = P.settings.withDefaults();
+
+  chrome.storage.local.get('settings', v => { settings = P.settings.withDefaults(v.settings); });
+  chrome.storage.onChanged.addListener(changes => {
+    if (changes.settings) settings = P.settings.withDefaults(changes.settings.newValue);
+  });
+
+  // The shop's host, even from inside a payment iframe.
+  function topHost() {
+    const origins = location.ancestorOrigins;
+    const origin = origins && origins.length ? origins[origins.length - 1] : location.origin;
+    try { return P.settings.normalizeHost(new URL(origin).hostname); } catch (_) { return P.settings.normalizeHost(location.hostname); }
+  }
 
   function clickableFrom(target) {
     let el = target;
@@ -45,12 +58,15 @@
     const verdict = P.detector.classify(describe(el));
     if (!verdict.isPurchase) return;
 
+    const found = P.pricefinder.findPrice(document, { clicked: el, label: verdict.label });
+    const rule = P.settings.shouldHold(settings, { host: topHost(), price: found.price });
+    if (!rule.hold) return; // snoozed, allowlisted or under the threshold
+
     event.preventDefault();
     event.stopImmediatePropagation();
     if (held) return; // Penglu is already on it
 
     held = el;
-    const found = P.pricefinder.findPrice(document, { clicked: el, label: verdict.label });
     chrome.runtime.sendMessage({
       type: 'penglu:attempt', label: verdict.label, reason: verdict.reason,
       price: found.price, priceSource: found.source
@@ -68,38 +84,64 @@
     if (el) hold(e, el);
   }, true);
 
-  // ---- Top frame only: gather the product and show Penglu ----
+  // ---- Top frame only ----
 
-  // Name from the page; price from the clicking frame when it found one,
-  // otherwise from this (top) frame without a clicked element.
-  function findProduct(msg) {
-    const meta = name => {
-      const m = document.querySelector(`meta[property="${name}"], meta[name="${name}"]`);
-      return m && m.content;
+  // Remember the product page we're on, so that later, on a checkout page
+  // that no longer shows it, Penglu still knows what is being bought and
+  // can keep its link. Shops are single-page apps, so re-check on URL change.
+  if (window === window.top) {
+    let lastUrl = '';
+    const remember = () => {
+      if (location.href === lastUrl) return;
+      lastUrl = location.href;
+      setTimeout(() => {
+        try {
+          if (!P.product.isProductPage(document, location.href)) return;
+          const product = P.product.readProduct(document, location.href);
+          chrome.runtime.sendMessage({ type: 'penglu:product', site: topHost(), product });
+        } catch (e) { /* a page we can't read is fine */ }
+      }, 1500); // let prices render
     };
+    window.addEventListener('load', remember);
+    setInterval(remember, 2000);
+  }
+
+  // Name and link from this page if it's a product page, else from the
+  // remembered product. Price from the clicking frame when it found one.
+  async function findProduct(msg) {
+    const site = topHost();
+    const here = P.product.isProductPage(document, location.href) ? P.product.readProduct(document, location.href) : null;
+    let remembered = null;
+    try {
+      const { lastProducts } = await chrome.storage.local.get('lastProducts');
+      remembered = lastProducts && lastProducts[site];
+    } catch (_) { /* storage is optional */ }
+    const base = here || remembered || {};
     const titled = document.querySelector('#productTitle, h1');
-    const name = (titled && titled.innerText.trim()) || meta('og:title') || document.title;
+    const name = base.name || (titled && titled.innerText.trim()) || document.title;
     const found = msg.price ? { price: msg.price, source: msg.priceSource }
+      : base.price ? { price: base.price, source: 'product page' }
       : P.pricefinder.findPrice(document, {});
     return {
-      name: (name || '').replace(/\s+/g, ' ').slice(0, 120),
+      name: String(name || '').replace(/\s+/g, ' ').slice(0, 140),
       price: found.price, priceSource: found.source,
-      site: location.hostname.replace(/^www\./, ''), url: location.href
+      image: base.image || null,
+      site, url: base.url || location.href
     };
   }
 
-  function decide(decision, sourceFrameId) {
-    chrome.runtime.sendMessage({ type: 'penglu:decision', decision, sourceFrameId });
+  function decide(decision, sourceFrameId, record) {
+    chrome.runtime.sendMessage({ type: 'penglu:decision', decision, sourceFrameId, record });
   }
 
   chrome.runtime.onMessage.addListener(msg => {
     if (msg.type === 'penglu:show' && window === window.top) {
-      const attempt = { label: msg.label, reason: msg.reason, product: findProduct(msg) };
-      if (P.overlay) P.overlay.show(attempt, decision => decide(decision, msg.sourceFrameId));
-      else {
-        console.info('[Penglu] would hold this purchase:', attempt);
-        decide('release', msg.sourceFrameId);
-      }
+      findProduct(msg).then(product => {
+        const attempt = { label: msg.label, reason: msg.reason, product };
+        P.overlay.show(attempt, (decision, details) => decide(decision, msg.sourceFrameId, {
+          product, answers: details.answers, outcome: details.outcome
+        }));
+      });
     }
 
     if (msg.type === 'penglu:decision' && held) {
