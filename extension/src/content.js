@@ -50,7 +50,11 @@
     if (held) return; // Penglu is already on it
 
     held = el;
-    chrome.runtime.sendMessage({ type: 'penglu:attempt', label: verdict.label, reason: verdict.reason });
+    const found = P.pricefinder.findPrice(document, { clicked: el, label: verdict.label });
+    chrome.runtime.sendMessage({
+      type: 'penglu:attempt', label: verdict.label, reason: verdict.reason,
+      price: found.price, priceSource: found.source
+    });
   }
 
   window.addEventListener('click', e => {
@@ -66,37 +70,22 @@
 
   // ---- Top frame only: gather the product and show Penglu ----
 
-  function findProduct() {
+  // Name from the page; price from the clicking frame when it found one,
+  // otherwise from this (top) frame without a clicked element.
+  function findProduct(msg) {
     const meta = name => {
       const m = document.querySelector(`meta[property="${name}"], meta[name="${name}"]`);
       return m && m.content;
     };
-    const h1 = document.querySelector('h1');
-    const name = meta('og:title') || (h1 && h1.innerText.trim()) || document.title;
-
-    let price = null;
-    // 1. An "order total" line is the most honest number on a checkout page.
-    for (const el of document.querySelectorAll('div, span, td, p, li, strong, b')) {
-      const t = el.innerText || '';
-      if (t.length < 80 && /\b(order )?total\b/i.test(t)) {
-        price = P.price.parsePrice(t) || P.price.parsePrice((el.parentElement || el).innerText);
-        if (price) break;
-      }
-    }
-    // 2. Structured data.
-    if (!price) {
-      const itemprop = document.querySelector('[itemprop=price]');
-      const amount = meta('product:price:amount') || meta('og:price:amount') ||
-        (itemprop && (itemprop.getAttribute('content') || itemprop.innerText));
-      const currency = meta('product:price:currency') || meta('og:price:currency') || 'INR';
-      if (amount && Number(String(amount).replace(/,/g, '')) > 0) {
-        price = { amount: Number(String(amount).replace(/,/g, '')), currency };
-      }
-    }
-    // 3. The first price on the page.
-    if (!price && document.body) price = P.price.parsePrice(document.body.innerText.slice(0, 20000));
-
-    return { name: (name || '').slice(0, 120), price, site: location.hostname, url: location.href };
+    const titled = document.querySelector('#productTitle, h1');
+    const name = (titled && titled.innerText.trim()) || meta('og:title') || document.title;
+    const found = msg.price ? { price: msg.price, source: msg.priceSource }
+      : P.pricefinder.findPrice(document, {});
+    return {
+      name: (name || '').replace(/\s+/g, ' ').slice(0, 120),
+      price: found.price, priceSource: found.source,
+      site: location.hostname.replace(/^www\./, ''), url: location.href
+    };
   }
 
   function decide(decision, sourceFrameId) {
@@ -105,7 +94,7 @@
 
   chrome.runtime.onMessage.addListener(msg => {
     if (msg.type === 'penglu:show' && window === window.top) {
-      const attempt = { label: msg.label, reason: msg.reason, product: findProduct() };
+      const attempt = { label: msg.label, reason: msg.reason, product: findProduct(msg) };
       if (P.overlay) P.overlay.show(attempt, decision => decide(decision, msg.sourceFrameId));
       else {
         console.info('[Penglu] would hold this purchase:', attempt);

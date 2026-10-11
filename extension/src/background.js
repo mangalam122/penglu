@@ -11,7 +11,8 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
   if (msg.type === 'penglu:attempt') {
     chrome.tabs.sendMessage(
       tabId,
-      { type: 'penglu:show', label: msg.label, reason: msg.reason, sourceFrameId: sender.frameId },
+      { type: 'penglu:show', label: msg.label, reason: msg.reason, price: msg.price,
+        priceSource: msg.priceSource, sourceFrameId: sender.frameId },
       { frameId: 0 }
     );
   }

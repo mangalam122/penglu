@@ -21,6 +21,7 @@
         "src/price.js",
         "src/script.js",
         "src/overlay.js",
+        "src/pricefinder.js",
         "src/content.js"
       ]
     }
