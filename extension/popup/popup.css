@@ -4,7 +4,7 @@
   --fill: rgba(120, 120, 128, .12); --fill-strong: rgba(120, 120, 128, .2); --hair: rgba(60, 60, 67, .12);
   --ink: #1d1d1f; --ink-2: rgba(60, 60, 67, .64); --ink-3: rgba(60, 60, 67, .4);
   --accent: #0a7aff; --good: #1fa855; --aura-1: #8fb8ff; --aura-2: #c7a6ff; --aura-3: #8ff0d6;
-  --shadow: 0 10px 30px -12px rgba(30, 40, 80, .25);
+  --shadow: 0 10px 30px -12px rgba(30, 40, 80, .25); --seg: rgba(255, 255, 255, .92);
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -13,7 +13,7 @@
     --fill: rgba(120, 120, 128, .22); --fill-strong: rgba(120, 120, 128, .32); --hair: rgba(255, 255, 255, .08);
     --ink: #f5f5f7; --ink-2: rgba(235, 235, 245, .62); --ink-3: rgba(235, 235, 245, .34);
     --accent: #0a84ff; --good: #30d158; --aura-1: #1e4fd6; --aura-2: #6b2fd0; --aura-3: #0b8f74;
-    --shadow: 0 10px 30px -12px rgba(0, 0, 0, .6);
+    --shadow: 0 10px 30px -12px rgba(0, 0, 0, .6); --seg: rgba(255, 255, 255, .16);
     color-scheme: dark;
   }
 }
@@ -62,7 +62,7 @@ button:focus-visible, input:focus-visible, a:focus-visible { outline: none; box-
 
 .segmented { display: grid; grid-template-columns: 1fr 1fr; padding: 2px; border-radius: 10px; background: var(--fill); }
 .segmented button { height: 30px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--ink-2); }
-.segmented button[aria-selected="true"] { background: var(--glass); color: var(--ink); font-weight: 600;
+.segmented button[aria-selected="true"] { background: var(--seg); color: var(--ink); font-weight: 600;
   box-shadow: 0 2px 6px rgba(0, 0, 0, .12), inset 0 .5px 0 var(--edge); }
 
 .list { padding: 4px 0; overflow: hidden; }
