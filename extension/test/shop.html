@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kartly test shop · Penglu</title>
+<meta property="og:title" content="Aurora 75 Mechanical Keyboard">
+<style>
+  body { font: 15px/1.5 system-ui, sans-serif; margin: 0; background: #f5f6f8; color: #16203a; }
+  main { max-width: 860px; margin: 0 auto; padding: 24px 16px 48px; display: grid; gap: 20px; }
+  .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  h1 { margin: 0 0 4px; font-size: 24px; }
+  .total { font-size: 20px; font-weight: 700; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+  .case { border: 1px solid #e3e6ec; border-radius: 10px; padding: 12px; display: grid; gap: 8px; }
+  .case small { color: #6a7184; }
+  .case .expect { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+  .stop { color: #9a3b12; } .pass { color: #2f7a4d; }
+  button, .fake, input[type=submit] { font: 600 14px system-ui; padding: 10px 14px; border-radius: 8px; border: 0;
+    background: #f2b33d; color: #16203a; cursor: pointer; text-align: center; }
+  .secondary { background: #e6e9ef; }
+  #log { font: 13px ui-monospace, Menlo, monospace; background: #16203a; color: #e8eaf0; border-radius: 10px;
+    padding: 12px; min-height: 120px; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<main>
+  <section class="card">
+    <h1>Aurora 75 Mechanical Keyboard</h1>
+    <div>Hot-swap, RGB · Sold by Kartly Retail</div>
+    <div class="total">Order total: ₹9,995</div>
+    <p>Each box below is a button style found on real shops. Penglu should stop the
+      ones marked <b class="stop">STOP</b> and ignore the ones marked <b class="pass">PASS</b>.
+      Clicks that reach the shop are written to the log at the bottom.</p>
+  </section>
+
+  <section class="card grid" id="cases">
+    <div class="case"><span class="expect stop">Stop</span><button id="place">Place order</button><small>Plain button</small></div>
+    <div class="case"><span class="expect stop">Stop</span><a class="fake" href="#bought" role="button" id="buy">Buy now</a><small>Link styled as a button</small></div>
+    <div class="case"><span class="expect stop">Stop</span><div class="fake" role="button" tabindex="0" id="divbuy"><span>Pay ₹9,995</span></div><small>Div with role=button, text in a child</small></div>
+    <div class="case"><span class="expect stop">Stop</span><button id="icon" aria-label="Place your order">🛒 →</button><small>Icon button, label only in aria-label</small></div>
+    <div class="case"><span class="expect stop">Stop</span>
+      <form id="form"><input type="submit" value="Complete purchase" id="submit"></form><small>Form submit input (try Enter too)</small></div>
+    <div class="case"><span class="expect pass">Pass</span><button class="secondary" id="cart">Add to cart</button><small>Staging, not buying</small></div>
+    <div class="case"><span class="expect pass">Pass</span><button class="secondary" id="checkout">Proceed to checkout</button><small>Leads to checkout, doesn't pay</small></div>
+    <div class="case"><span class="expect pass">Pass</span><button class="secondary" id="continue">Continue</button><small>Weak label, and this isn't a /checkout URL</small></div>
+    <div class="case"><span class="expect pass">Pass</span><button class="secondary" id="wish">Add to wishlist</button><small>Wishlist</small></div>
+    <div class="case"><span class="expect pass">Known gap</span><div class="fake" id="bare" onclick="">Buy now</div><small>Bare div with a click handler and no role. Penglu can't see it yet; Phase 5 teaching fixes this.</small></div>
+  </section>
+
+  <section class="card">
+    <b>What reached the shop</b>
+    <div id="log"></div>
+  </section>
+</main>
+<script>
+  const log = msg => {
+    const el = document.getElementById('log');
+    el.textContent = `${new Date().toLocaleTimeString()}  ${msg}\n` + el.textContent;
+  };
+  document.querySelectorAll('#cases button, #cases .fake').forEach(el =>
+    el.addEventListener('click', e => { e.preventDefault(); log(`clicked "${el.innerText.trim() || el.getAttribute('aria-label')}" (#${el.id})`); }));
+  document.getElementById('form').addEventListener('submit', e => { e.preventDefault(); log('form submitted (#form)'); });
+</script>
+</body>
+</html>
