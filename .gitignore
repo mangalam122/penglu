@@ -1,0 +1,8 @@
+.DS_Store
+node_modules/
+*.zip
+# Xcode
+macos/build/
+macos/DerivedData/
+*.xcuserstate
+xcuserdata/

@@ -1,0 +1,34 @@
+# Penglu
+
+Penglu is a small penguin butler who stops impulse purchases. When you click
+the final "Buy" or "Place order" button on any website, Penglu holds the order
+for 2 minutes, asks why you need it, shows what it costs in hours of your work,
+and politely begs you to reconsider. Everything you skip is kept in a ledger,
+with its link, so you can see how much you saved each month.
+
+> "I beg your pardon, sir, but I must intervene. Do sit down."
+
+## How it's built
+
+| Part | What it does | Status |
+|---|---|---|
+| `extension/` | Chrome extension: detects purchase clicks, blocks them, runs the hold | Phase 1, in progress |
+| `macos/` | Native menu-bar app: floating Penglu popup, local model, ledger | Phase 2+ |
+
+The extension works on its own. Once the Mac app exists, the extension hands
+the purchase to it over Native Messaging and only falls back to its own
+in-page overlay when the app isn't running.
+
+## Try the extension
+
+1. Open `chrome://extensions` and turn on **Developer mode**.
+2. Click **Load unpacked** and pick the `extension/` folder.
+3. Open `extension/test/shop.html` (or any shop) and click a buy button.
+
+## Run the tests
+
+```bash
+npm test
+```
+
+See [docs/PLAN.md](docs/PLAN.md) for the coding plan.
