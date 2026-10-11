@@ -12,7 +12,7 @@ with its link, so you can see how much you saved each month.
 
 | Part | What it does | Status |
 |---|---|---|
-| `extension/` | Chrome extension: detects purchase clicks, blocks them, runs the hold | Phase 1, in progress |
+| `extension/` | Chrome extension: detects purchase clicks, blocks them, runs the hold | Phase 1 done |
 | `macos/` | Native menu-bar app: floating Penglu popup, local model, ledger | Phase 2+ |
 
 The extension works on its own. Once the Mac app exists, the extension hands
@@ -23,7 +23,12 @@ in-page overlay when the app isn't running.
 
 1. Open `chrome://extensions` and turn on **Developer mode**.
 2. Click **Load unpacked** and pick the `extension/` folder.
-3. Open `extension/test/shop.html` (or any shop) and click a buy button.
+3. On the Penglu card, click **Details** and turn on **Allow access to file URLs**
+   (only needed for the local test shop).
+4. Open `extension/test/shop.html` and click **Place order**.
+
+The first time, Penglu asks what you earn in an hour so he can turn prices
+into hours of work. He remembers it after that.
 
 ## Run the tests
 

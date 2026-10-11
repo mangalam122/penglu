@@ -11,18 +11,19 @@ and unlock logic are plain code. A model only ever writes Penglu's lines.
 
 Goal: clicking a final buy button on any site is held for 2 minutes by Penglu.
 
-- [ ] `extension/src/detector.js`: pure function, decides if a click is a purchase
+- [x] `extension/src/detector.js`: pure function, decides if a click is a purchase
   - text and `aria-label` / `value` matching (buy now, place order, pay ₹, checkout…)
   - checkout-like URLs raise confidence
   - excludes add to cart, wishlist, buy-again browsing links
   - unit tests with Node's built-in test runner, no dependencies
-- [ ] `extension/manifest.json`: Manifest V3, content script on all URLs and frames
-- [ ] `extension/src/content.js`: capture-phase click listener, blocks the click,
+- [x] `extension/manifest.json`: Manifest V3, content script on all URLs and frames
+- [x] `extension/src/content.js`: capture-phase click listener, blocks the click,
       one-time pass so the user's next click goes through
-- [ ] `extension/src/overlay.js`: Penglu in a Shadow DOM panel, 2-minute timer,
+- [x] `extension/src/overlay.js`: Penglu in a Shadow DOM panel, 2-minute timer,
       questions, work-hours cost, canned lines, skip / need it buttons
-- [ ] `extension/test/shop.html`: fake shop with a dozen button variants
+- [x] `extension/test/shop.html`: fake shop with a dozen button variants
 - **Demo:** load unpacked, click Place order on the test shop, Penglu appears.
+- Known gap: a bare `<div>` with a click handler and no role isn't detected yet (Phase 5 teaching).
 
 ## Phase 2: Ledger in the extension
 
