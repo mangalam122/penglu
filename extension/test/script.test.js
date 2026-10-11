@@ -41,3 +41,9 @@ test('every question has a line and a known kind', () => {
   }
   assert.equal(S.HOLD_SECONDS, 120);
 });
+
+test('repeat-attempt line names the attempt', () => {
+  const l = S.line('repeat', { n: 'third' }, 0);
+  assert.match(l.text, /third attempt this week/);
+  assert.equal(l.mood, 'raised_eyebrow');
+});

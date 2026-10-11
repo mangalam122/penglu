@@ -43,6 +43,10 @@
       '{price} comes to {hours} hours of your labour, sir. A long shift for {name}.'
     ],
     askRate: ['To weigh this properly, sir, what do you earn in an hour?'],
+    repeat: [
+      'This is the {n} attempt this week, sir. Persistence is admirable in other contexts.',
+      'The {n} time this week, sir. I am beginning to recognise the look in your eye.'
+    ],
     beg: [
       'I am not angry, sir. Merely disappointed. Profoundly.',
       'I have served this household for many years, sir. I implore you.',
@@ -64,7 +68,7 @@
   const MOODS = {
     arrive: 'composed', afterWhy: 'raised_eyebrow', lowImportance: 'pained',
     highImportance: 'composed', ownsOne: 'despair', cost: 'pained', askRate: 'raised_eyebrow',
-    beg: 'despair', decide: 'composed', skipped: 'approving', bought: 'pained'
+    repeat: 'raised_eyebrow', beg: 'despair', decide: 'composed', skipped: 'approving', bought: 'pained'
   };
 
   function fill(template, ctx) {
