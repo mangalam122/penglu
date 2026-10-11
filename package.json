@@ -5,5 +5,8 @@
   "description": "A penguin butler who stops impulse purchases",
   "scripts": {
     "test": "node --test extension/test/*.test.js"
+  },
+  "devDependencies": {
+    "jsdom": "^24.1.3"
   }
 }
